@@ -6,7 +6,6 @@ package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 //import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.XboxController;
@@ -39,10 +38,8 @@ import frc.robot.subsystems.SwerveDrivetrain;
 import frc.robot.subsystems.CoralIntake;
 import frc.robot.subsystems.Climber;
 import frc.robot.commands.drivetrain.*;
-import frc.robot.commands.groups.*;
 import frc.robot.commands.intake.CoralIntakeMovement;
 //import frc.robot.commands.gamepad.*;
-import frc.robot.auton.common.*;
 
 
 /*
@@ -173,11 +170,11 @@ public class RobotContainer {
 					-MathUtil.applyDeadband(joyMain.getRightX() * speedMult, JOYSTICK_AXIS_THRESHOLD),
 					fieldRelative, true, 
 					MathUtil.applyDeadband(copilotGamepad.getLeftY(), JOYSTICK_AXIS_THRESHOLD), 
-					MathUtil.applyDeadband(copilotGamepad.getRightY(), JOYSTICK_AXIS_THRESHOLD),
-					MathUtil.applyDeadband(joyMain.getRightTriggerAxis(), JOYSTICK_AXIS_THRESHOLD),
-					MathUtil.applyDeadband(joyMain.getLeftTriggerAxis(), JOYSTICK_AXIS_THRESHOLD),
-					MathUtil.applyDeadband(copilotGamepad.getLeftTriggerAxis(), JOYSTICK_AXIS_THRESHOLD),
-					MathUtil.applyDeadband(copilotGamepad.getRightTriggerAxis(), JOYSTICK_AXIS_THRESHOLD)),
+					MathUtil.applyDeadband(copilotGamepad.getRightY(), JOYSTICK_AXIS_THRESHOLD)),
+					// MathUtil.applyDeadband(joyMain.getRightTriggerAxis(), JOYSTICK_AXIS_THRESHOLD),
+					// MathUtil.applyDeadband(joyMain.getLeftTriggerAxis(), JOYSTICK_AXIS_THRESHOLD)),
+					// MathUtil.applyDeadband(copilotGamepad.getLeftTriggerAxis(), JOYSTICK_AXIS_THRESHOLD),
+					// MathUtil.applyDeadband(copilotGamepad.getRightTriggerAxis(), JOYSTICK_AXIS_THRESHOLD)),
 				drivetrain, intake, climber));
 				
 		
@@ -202,14 +199,14 @@ public class RobotContainer {
 	 */
 
 	public void updateJoystick(double xSpeed, double ySpeed, double rot, Boolean fieldRelative, 
-	Boolean rateLimit, double leftYValue, double RightYValue, double leftTrig, double rightTrig, double coLeftTrig, double coRightTrig) {
+	Boolean rateLimit, double leftYValue, double RightYValue) { //, double leftTrig, double rightTrig, double coLeftTrig, double coRightTrig
 		drivetrain.drive(xSpeed, ySpeed, rot, fieldRelative, rateLimit);
 		intake.armMove(leftYValue);
 		intake.wristMove(RightYValue);
-		intake.wheelOut(leftTrig);
-		intake.wheelIn(rightTrig);
-		climber.climbMove(coLeftTrig);
-		climber.climbMoveRev(coRightTrig);
+		// intake.wheelOut(leftTrig);
+		// intake.wheelIn(rightTrig);
+		// climber.climbMove(coLeftTrig);
+		// climber.climbMoveRev(coRightTrig);
 	}
 
 	public void toggleSpeed(){
@@ -280,6 +277,14 @@ public class RobotContainer {
 		joyMain.button(6).onFalse(Commands.runOnce(() -> intake.stopWheels())); //button:RB
 
 		joyMain.button(4).onTrue(new DrivetrainZeroHeading(drivetrain));	//button:y, resets the field to current robot direction for field-relative mode
+
+		joyMain.leftTrigger(0.15).whileTrue(Commands.run(() -> intake.wheelOut(joyMain.getLeftTriggerAxis())));
+
+		joyMain.leftTrigger(0.15).onFalse(Commands.runOnce(() -> intake.stopWheels()));
+
+		joyMain.rightTrigger(0.15).whileTrue(Commands.run(() -> intake.wheelIn(joyMain.getRightTriggerAxis())));
+
+		joyMain.rightTrigger(0.15).onFalse(Commands.runOnce(() -> intake.stopWheels()));
 
 		/*------------------ Copilot ------------------*/
 

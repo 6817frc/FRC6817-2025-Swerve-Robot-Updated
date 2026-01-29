@@ -30,7 +30,6 @@ import com.studica.frc.AHRS.NavXComType;
 
 import frc.robot.Constants;
 import frc.robot.Constants.DrivetrainConstants;
-import frc.robot.Constants.SwerveModuleConstants;
 import frc.utils.SwerveUtils;
 import frc.robot.Ports;
 
